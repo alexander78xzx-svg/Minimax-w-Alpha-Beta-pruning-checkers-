@@ -11,7 +11,6 @@ board  = [[0,2,0,2,0,2,0,2],
            [0,1,0,1,0,1,0,1],
            [1,0,1,0,1,0,1,0]]
 
-board1 = [[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,2,0,0,0,0],[0,0,0,0,3,0,0,0],[0,4,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,0]]
 pygame.init()
 screen = pygame.display.set_mode((800, 800))
 pygame.display.set_caption("Checkers")
@@ -58,9 +57,7 @@ def can_king_jump_again(board, r_start, c_start, enemy_ids):
         for i in range(1, 8):
             r = r_start + (d_row * i)
             c = c_start + (d_col * i)
-            
             if not (0 <= r < 8 and 0 <= c < 8): break
-            
             cell = board[r][c]
             if cell in enemy_ids:
                 if enemy_seen: break 
@@ -237,289 +234,44 @@ def get_pieces_that_can_eat():
                     if check_ememies(board[i][j],(i,j)):
                         moves.append((i,j))
     return moves
+def perform_jump(board,selected_piece,target):
+    row_start,col_start = selected_piece
+    row_end,col_end = target
+    captured = False
+    if abs(row_start-row_end)>1:
+        row_step = 1 if row_start < row_end else -1
+        col_step = 1 if col_start < col_end else -1
+        row_current,col_current = row_start + row_step, col_start+col_step
+        while row_current != row_end:
+            if 0 <= row_current < 8 and 0 <= col_current <8:
+                if board[row_current][col_current] != 0:
+                    board[row_current][col_current] = 0
+                    captured = True
+            row_current+=row_step
+            col_current+=col_step
+    return captured
 def move(selected_piece,target):
-    global current_player
     global another_move
-    if current_player%2!=0:
-        if board[selected_piece[0]][selected_piece[1]]==1:
-            # jump logic
-            if selected_piece[0] >= 2 and selected_piece[1] >= 2:
-                if target==(selected_piece[0]-2,selected_piece[1]-2): # top left
-                    if board[selected_piece[0]-1][selected_piece[1]-1] in [2,4]:
-                        if board[target[0]][target[1]]==0:
-                            board[selected_piece[0]][selected_piece[1]] = 0
-                            if target[0]==0:
-                                board[target[0]][target[1]] = 3
-                            else:
-                                board[target[0]][target[1]] = 1
-                            board[selected_piece[0]-1][selected_piece[1]-1] = 0
-                            selected_piece = None
-                            if check_ememies(board[target[0]][target[1]],target):
-                                another_move = True
-                                return "double"
-                            else:
-                                another_move = False
-                                return True
-            if selected_piece[0] >= 2 and selected_piece[1] <= 5:
-                if target==(selected_piece[0]-2,selected_piece[1]+2): # top right
-                    if board[selected_piece[0]-1][selected_piece[1]+1] in [2,4]:
-                        if board[target[0]][target[1]]==0:
-                            board[selected_piece[0]][selected_piece[1]] = 0
-                            if target[0]==0:
-                                board[target[0]][target[1]] = 3
-                            else:
-                                board[target[0]][target[1]] = 1
-                            board[selected_piece[0]-1][selected_piece[1]+1] = 0
-                            selected_piece = None
-                            if check_ememies(board[target[0]][target[1]],target):
-                                another_move = True
-                                return "double"
-                            else:
-                                another_move = False
-                                return True
-            if selected_piece[0] <= 5 and selected_piece[1] >= 2:
-                if target==(selected_piece[0]+2,selected_piece[1]-2): # bottom left
-                    if board[selected_piece[0]+1][selected_piece[1]-1] in [2,4]:
-                        if board[target[0]][target[1]]==0:
-                            board[selected_piece[0]][selected_piece[1]] = 0
-                            if target[0]==0:
-                                board[target[0]][target[1]] = 3
-                            else:
-                                board[target[0]][target[1]] = 1
-                            board[selected_piece[0]+1][selected_piece[1]-1] = 0
-                            selected_piece = None
-                            if check_ememies(board[target[0]][target[1]],target):
-                                another_move = True
-                                return "double"
-                            else:
-                                another_move = False
-                                return True
-            if selected_piece[0] <= 5 and selected_piece[1] <= 5:
-                if target==(selected_piece[0]+2,selected_piece[1]+2): # bottom right
-                    if board[selected_piece[0]+1][selected_piece[1]+1] in [2,4]:
-                        if board[target[0]][target[1]]==0:
-                            board[selected_piece[0]][selected_piece[1]] = 0
-                            if target[0]==0:
-                                board[target[0]][target[1]] = 3
-                            else:
-                                board[target[0]][target[1]] = 1
-                            board[selected_piece[0]+1][selected_piece[1]+1] = 0
-                            selected_piece = None
-                            if check_ememies(board[target[0]][target[1]],target):
-                                another_move = True
-                                return "double"
-                            else:
-                                another_move = False
-                                return True
-            if another_move == False:
-                if (target==(selected_piece[0]-1,selected_piece[1]-1) or target==(selected_piece[0]-1,selected_piece[1]+1)) and board[target[0]][target[1]]==0 :
-                    board[selected_piece[0]][selected_piece[1]] = 0
-                    if target[0]==0:
-                        board[target[0]][target[1]] = 3
-                    else:
-                        board[target[0]][target[1]] = 1
-                    selected_piece = None
-                    return True
-        if board[selected_piece[0]][selected_piece[1]]==3:
-            #slide logic:
-            if (target==(selected_piece[0]-1,selected_piece[1]-1) or target==(selected_piece[0]-1,selected_piece[1]+1) or target==(selected_piece[0]+1,selected_piece[1]+1) or target==(selected_piece[0]+1,selected_piece[1]-1)) and board[target[0]][target[1]]==0 :
-                board[selected_piece[0]][selected_piece[1]] = 0
-                board[target[0]][target[1]] = 3
-                selected_piece = None
-                return True
-            #jump logic:
-            r_start, c_start = selected_piece
-            valid_moves = []
-            directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
-
-            for d_row, d_col in directions:
-                enemy_seen = False
-                for i in range(1, 8):
-                    r = r_start + (d_row * i)
-                    c = c_start + (d_col * i)
-                    
-                    if not (0 <= r < 8 and 0 <= c < 8):
-                        break
-
-                    cell = board[r][c]
-                    if cell == 0:
-                        if enemy_seen:
-                            valid_moves.append((r, c))
-                        else:
-                            valid_moves.append((r, c))
-                    elif cell in [2, 4]:
-                        if enemy_seen: break 
-                        enemy_seen = True
-                    elif cell in [1, 3]:
-                        break
-            if (target[0], target[1]) in valid_moves:
-                # Move the King
-                board[target[0]][target[1]] = 3
-                board[r_start][c_start] = 0
-                selected_piece = None
-                
-                captured = False
-                if abs(target[0] - r_start) > 1:
-                    step_r = 1 if target[0] > r_start else -1
-                    step_c = 1 if target[1] > c_start else -1
-                    current_r, current_c = r_start + step_r, c_start + step_c
-                    while current_r != target[0]:
-                        if 0 <= current_r < 8 and 0 <= current_c < 8:
-                            if board[current_r][current_c] in [2, 4]:
-                                board[current_r][current_c] = 0
-                                captured = True
-                        current_r += step_r
-                        current_c += step_c
-                if captured:
-                    if can_king_jump_again(board, target[0], target[1], enemy_ids=[2, 4]):
-                        print("Double jump available! Turn continues.")
-                        return "double"
-                    else:
-                        return True
-                else:
-                    return True
-    elif current_player%2==0:
-        if board[selected_piece[0]][selected_piece[1]]==2:
-            # jump logic
-            if selected_piece[0] >= 2 and selected_piece[1] >= 2:
-                if target==(selected_piece[0]-2,selected_piece[1]-2): # top left
-                    if board[selected_piece[0]-1][selected_piece[1]-1] in [1,3]:
-                        if board[target[0]][target[1]]==0:
-                            board[selected_piece[0]][selected_piece[1]] = 0
-                            if target[0]==7:
-                                board[target[0]][target[1]] = 4
-                            else:
-                                board[target[0]][target[1]] = 2
-                            board[selected_piece[0]-1][selected_piece[1]-1] = 0
-                            selected_piece = None
-                            if check_ememies(board[target[0]][target[1]],target):
-                                another_move = True
-                                return "double"
-                            else:
-                                another_move = False
-                                return True
-            if selected_piece[0] >= 2 and selected_piece[1] <= 5:
-                if target==(selected_piece[0]-2,selected_piece[1]+2): # top right
-                    if board[selected_piece[0]-1][selected_piece[1]+1] in [1,3]:
-                        if board[target[0]][target[1]]==0:
-                            board[selected_piece[0]][selected_piece[1]] = 0
-                            if target[0]==7:
-                                board[target[0]][target[1]] = 4
-                            else:
-                                board[target[0]][target[1]] = 2
-                            board[selected_piece[0]-1][selected_piece[1]+1] = 0
-                            selected_piece = None
-                            if check_ememies(board[target[0]][target[1]],target):
-                                another_move = True
-                                return "double"
-                            else:
-                                another_move = False
-                                return True
-            if selected_piece[0] <= 5 and selected_piece[1] >= 2:
-                if target==(selected_piece[0]+2,selected_piece[1]-2): # bottom left
-                    if board[selected_piece[0]+1][selected_piece[1]-1] in [1,3]:
-                        if board[target[0]][target[1]]==0:
-                            board[selected_piece[0]][selected_piece[1]] = 0
-                            if target[0]==7:
-                                board[target[0]][target[1]] = 4
-                            else:
-                                board[target[0]][target[1]] = 2
-                            board[selected_piece[0]+1][selected_piece[1]-1] = 0
-                            selected_piece = None
-                            if check_ememies(board[target[0]][target[1]],target):
-                                another_move = True
-                                return "double"
-                            else:
-                                another_move = False
-                                return True
-            if selected_piece[0] <= 5 and selected_piece[1] <= 5:
-                if target==(selected_piece[0]+2,selected_piece[1]+2): # bottom right
-                    if board[selected_piece[0]+1][selected_piece[1]+1] in [1,3]:
-                        if board[target[0]][target[1]]==0:
-                            board[selected_piece[0]][selected_piece[1]] = 0
-                            if target[0]==7:
-                                board[target[0]][target[1]] = 4
-                            else:
-                                board[target[0]][target[1]] = 2
-                            board[selected_piece[0]+1][selected_piece[1]+1] = 0
-                            selected_piece = None
-                            if check_ememies(board[target[0]][target[1]],target):
-                                another_move = True
-                                return "double"
-                            else:
-                                another_move = False
-                                return True
-            if another_move == False:
-                if (target==(selected_piece[0]+1,selected_piece[1]-1) or target==(selected_piece[0]+1,selected_piece[1]+1)) and board[target[0]][target[1]]==0 :
-                    board[selected_piece[0]][selected_piece[1]] = 0
-                    if target[0]==7:
-                        board[target[0]][target[1]] = 4
-                    else:
-                        board[target[0]][target[1]] = 2
-                    selected_piece = None
-                    return True
-        if board[selected_piece[0]][selected_piece[1]] == 4:
-            # slide logic (Standard move)
-            if (target == (selected_piece[0]-1, selected_piece[1]-1) or 
-                target == (selected_piece[0]-1, selected_piece[1]+1) or 
-                target == (selected_piece[0]+1, selected_piece[1]+1) or 
-                target == (selected_piece[0]+1, selected_piece[1]-1)) and board[target[0]][target[1]] == 0:
-                
-                board[selected_piece[0]][selected_piece[1]] = 0
-                board[target[0]][target[1]] = 4
-                selected_piece = None
-                return True
-
-            # jump logic:
-            r_start, c_start = selected_piece
-            valid_moves = []
-            directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
-            
-            for d_row, d_col in directions:
-                enemy_seen = False
-                for i in range(1, 8):
-                    r = r_start + (d_row * i)
-                    c = c_start + (d_col * i)
-                    
-                    if not (0 <= r < 8 and 0 <= c < 8): break
-
-                    cell = board[r][c]
-                    if cell == 0:
-                        valid_moves.append((r, c))
-                    elif cell in [1, 3]:
-                        if enemy_seen: break
-                        enemy_seen = True
-                    elif cell in [2, 4]:
-                        break
-
-            if (target[0], target[1]) in valid_moves:
-                board[target[0]][target[1]] = 4
-                board[r_start][c_start] = 0
-                selected_piece = None
-                
-                captured = False
-                if abs(target[0] - r_start) > 1:
-                    step_r = 1 if target[0] > r_start else -1
-                    step_c = 1 if target[1] > c_start else -1
-                    current_r, current_c = r_start + step_r, c_start + step_c
-                    
-                    while current_r != target[0]:
-                        if 0 <= current_r < 8 and 0 <= current_c < 8:
-                            if board[current_r][current_c] in [1, 3]:
-                                board[current_r][current_c] = 0
-                                captured = True
-                        current_r += step_r
-                        current_c += step_c
-                if captured:
-                    if can_king_jump_again(board, target[0], target[1], enemy_ids=[1, 3]):
-                        return "double"
-                    else:
-                        return True
-                else:
-                    return True
-    return False
-
+    row_start,col_start = selected_piece
+    row_end,col_end = target
+    piece_type = board[row_start][col_start]
+    is_white = piece_type in [1,3]
+    enemy_ids = [2,4] if is_white else [1,3]
+    board[row_end][col_end]=piece_type
+    board[row_start][col_start]=0
+    captured = perform_jump(board,selected_piece,target)
+    if piece_type == 1 and row_end==0:
+        board[row_end][col_end]=3
+    if piece_type == 2 and row_end==7:
+        board[row_end][col_end]=4
+    if captured:
+        if can_king_jump_again(board,row_end,col_end,enemy_ids):
+            another_move = True
+            return "double"
+    another_move = False
+    return True
 running = True
+another_move = False
 while running:
     for event in pygame.event.get():        #game loop
         if event.type == pygame.QUIT:
@@ -550,17 +302,43 @@ while running:
                             selected_piece = (pos1,pos2)
             if selected_piece!=None and selected==0:
                 target = (pos1,pos2)
+                row_diff = target[0]-selected_piece[0]
+                col_diff = target[1]-selected_piece[1]
+                distance = abs(row_diff)
+                
+                if distance != abs(col_diff):
+                    continue
+                if another_move and distance <2:
+                    continue
+                piece_val = board[selected_piece[0]][selected_piece[1]]
+                is_king = piece_val in [3,4]
+                if not is_king:
+                    if distance>2:
+                        continue
+                    if piece_val==1 and row_diff>0:
+                        if distance < 2:
+                            continue
+                    if piece_val==2 and row_diff<0:
+                        if distance < 2:
+                            continue
+
+                if another_move:
+                    
+                    if distance <2:
+                        continue
                 succes = move(selected_piece,target)
                 if succes=="double":
                     another_move = True
                     selected_piece=target
                 elif succes==True:
                     current_player+=1
-                    print(current_player)
-                selected_piece = None
+                    another_move = False
+                    selected_piece = None
                 pos1 = None
                 pos2 = None
                 if check_win():
+                    winner = "White" if current_player%2!=0 else "Black"
+                    print(f"Game over!, {winner} won!")
                     running = False
 
 
