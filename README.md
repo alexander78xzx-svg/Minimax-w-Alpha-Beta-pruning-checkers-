@@ -2,8 +2,7 @@
 
 A fully functional Checkers engine built from scratch in Python, featuring an unbeatable AI powered by the Minimax Algorithm with  Alpha-Beta Pruning optimization.
 
-![Checkers Gameplay](https://imgur.com/a/n5q1rxs)
-*(https://imgur.com/a/n5q1rxs)*
+![Checkers Gameplay](https://i.imgur.com/7LmSO3Q.gif)
 
 ## About The Project
 
@@ -45,7 +44,7 @@ At the maximum depth, the AI cannot predict further, so it calculates a "score" 
     
 -   King Weight: A King is worth 3 points (prioritizing promotion).
 
-The score is calculated as: `(White Score) - (Red Score)`. Positive values favor White (AI), negative values favor Red (Human).
+The score is calculated as: `(White Score) - (Red Score)`. Positive values favor the player, negative values favor AI.
 
 ### 3. Alpha-Beta Pruning (Optimization)
 
@@ -64,3 +63,4 @@ The engine handles unique Checkers edge cases that standard Minimax implementati
 -   Forced Captures (Global): Before generating moves, the engine scans the entire board to check for capture opportunities. If a capture exists, all non-capture moves are invalidated to enforce standard tournament rules.
     
 -   Recursive Double Jumps: When a piece captures, the engine recursively calls the move function to check if the same piece can jump again. This allows the AI to "see" and execute multi-jump chains in a single turn.
+
