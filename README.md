@@ -2,7 +2,8 @@
 
 A fully functional Checkers engine built from scratch in Python, featuring an unbeatable AI powered by the Minimax Algorithm with  Alpha-Beta Pruning optimization.
 
-![1226-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/653877a7-43e0-479c-b18f-307b57412f73)
+![1226-ezgif com-video-to-gif-converter (1)](https://github.com/user-attachments/assets/f3722401-09bc-43b5-b473-9a3596ccb355)
+
 
 ## About The Project
 
