@@ -2,9 +2,10 @@
 
 A fully functional Checkers engine built from scratch in Python, featuring an unbeatable AI powered by the Minimax Algorithm with  Alpha-Beta Pruning optimization.
 
-![Checkers Gameplay](https://i.imgur.com/7LmSO3Q.gif)
+![1226-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/653877a7-43e0-479c-b18f-307b57412f73)
 
 ## About The Project
+
 
 This project is a complete implementation of the game of Checkers (Draughts) with a graphical user interface (GUI) and an intelligent "AI" opponent. 
 
